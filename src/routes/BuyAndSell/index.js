@@ -38,7 +38,7 @@ class ChartComponent extends React.Component {
         return null;
       });
       this.setState({data});
-    })),60000);
+    })),180000);
     // getData().then(data => {
     //   this.setState({ data })
     // })
