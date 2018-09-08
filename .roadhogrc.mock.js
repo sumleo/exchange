@@ -12,9 +12,12 @@ const noProxy = process.env.NO_PROXY === 'true';
 
 const baseURL="http://www.ucomputingchain.com:3030";
 // 代码中会兼容本地 service mock 以及部署站点的静态数据
+
 const proxy = {
   'GET /trade/options':`${baseURL}/`,
-  'POST /api/user/reg':`${baseURL}/user`,
+  'GET /tx/options':`${baseURL}/`,
+  'POST /user':`${baseURL}/`,
+  'PUT /userProfile':`PUT ${baseURL}/userProfile`,
   'GET /user(.*)':`${baseURL}/user`,
   // 支持值为 Object 和 Array
   'GET /api/currentUser': {

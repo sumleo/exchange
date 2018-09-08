@@ -1,12 +1,10 @@
-import {doList,buyLong,buyShort} from '../services/api_option';
-import {message} from 'antd';
+import {doList} from '../services/api_history';
 
 export default {
-  namespace: 'option',
+  namespace: 'history',
 
   state: {
     list:[],
-    count:0.
   },
 
   effects: {
@@ -19,14 +17,6 @@ export default {
         payload:response,
       });
     },
-    *buyLong({payload}, { call }) {
-      const response=yield call(buyLong,payload);
-      message.info(response);
-    },
-    *buyShort({payload}, { call }) {
-      const response=yield call(buyShort,payload);
-      message.info(response);
-    },
   },
 
   reducers: {
@@ -34,7 +24,6 @@ export default {
       return {
         ...state,
         list:payload.list||[],
-        count:payload.count||0,
       };
     },
   },

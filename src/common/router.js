@@ -97,6 +97,12 @@ export const getRouterData = app => {
     '/buy-and-sell/index': {
       component: dynamicWrapper(app, ['chart','login','option'], () => import('../routes/BuyAndSell/Analysis')),
     },
+    '/history/history': {
+      component: dynamicWrapper(app, ['history','login'], () => import('../routes/History/History')),
+    },
+    '/account/account': {
+      component: dynamicWrapper(app, ['account','login'], () => import('../routes/Account/Account')),
+    },
     '/dashboard/analysis': {
       component: dynamicWrapper(app, ['chart'], () => import('../routes/Dashboard/Analysis')),
     },

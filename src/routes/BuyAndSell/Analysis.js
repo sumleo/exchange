@@ -3,17 +3,12 @@ import { connect } from 'dva';
 import {
   Row,
   Col,
-  Icon,
   Card,
   Tabs,
   Table,
-  Radio,
   DatePicker,
-  Tooltip,
-  Menu,
-  Dropdown,
   Button,
-  Input,
+  Form,Input,
 } from 'antd';
 import numeral from 'numeral';
 import {
@@ -55,80 +50,73 @@ const Yuan = ({ children }) => (
   chart,login,option,
   loading: loading.effects['chart/fetch'],
 }))
+@Form.create()
 export default class Analysis extends Component {
   state = {
-    salesType: 'all',
-    currentTabKey: '',
-    rangePickerValue: getTimeDistance('year'),
+    list:[],
+    optDetail:{},
+    long:"",
+    short:"",
   };
 
   componentDidMount() {
-    const { dispatch } = this.props;
+    const { dispatch,option} = this.props;
+    const {list=[]}=option;
     dispatch({
       type: 'chart/fetch',
     });
     dispatch({
       type:'option/getPage',
       payload:{token:this.props.login.token},
+    });
+  }
+
+
+  handleViewDetail=(e,id)=>{
+    e.preventDefault();
+    const {option}=this.props;
+    const {list}=option;
+    let target={};
+    list.map((e)=>{
+      console.log(e,id);
+      if(e.optID===id){
+          target=e;
+      }
+    });
+    this.setState({
+      optDetail:target,
     })
-  }
+  };
 
-  componentWillUnmount() {
-    const { dispatch } = this.props;
+  handleBuyLong=()=>{
+    const {form,dispatch,login} =this.props;
+    const {token=""}=login;
+    const {optDetail} =this.state;
+    const {optID}=optDetail;
+    const numBet=parseFloat(form.getFieldValue("long")||"");
+    const hacAddress="";
     dispatch({
-      type: 'chart/clear',
-    });
-  }
-
-  handleChangeSalesType = e => {
-    this.setState({
-      salesType: e.target.value,
+      type:"option/buyLong",
+      payload:{numBet,hacAddress,optID,token},
     });
   };
 
-  handleTabChange = key => {
-    this.setState({
-      currentTabKey: key,
-    });
-  };
-
-  handleRangePickerChange = rangePickerValue => {
-    this.setState({
-      rangePickerValue,
-    });
-
-    const { dispatch } = this.props;
+  handleBuyShort=()=>{
+    const {form,dispatch,login} =this.props;
+    const {token=""}=login;
+    const {optDetail} =this.state;
+    const {optID}=optDetail;
+    const numBet=parseFloat(form.getFieldValue("short")||"");
+    const hacAddress="";
     dispatch({
-      type: 'chart/fetchSalesData',
+      type:"option/buyShort",
+      payload:{numBet,hacAddress,optID,token},
     });
   };
-
-  selectDate = type => {
-    this.setState({
-      rangePickerValue: getTimeDistance(type),
-    });
-
-    const { dispatch } = this.props;
-    dispatch({
-      type: 'chart/fetchSalesData',
-    });
-  };
-
-  isActive(type) {
-    const { rangePickerValue } = this.state;
-    const value = getTimeDistance(type);
-    if (!rangePickerValue[0] || !rangePickerValue[1]) {
-      return;
-    }
-    if (
-      rangePickerValue[0].isSame(value[0], 'day') &&
-      rangePickerValue[1].isSame(value[1], 'day')
-    ) {
-      return styles.currentDate;
-    }
-  }
 
   render() {
+    const {form} =this.props;
+    const {getFieldDecorator}=form;
     const topColResponsiveProps = {
       xs: 24,
       sm: 12,
@@ -152,16 +140,20 @@ export default class Analysis extends Component {
       sm: 12,
       md: 12,
       lg: 12,
-      xl: 6,
+      xl: 16,
       style: { marginBottom: 24 },
     };
 
     const OptionCard=(e)=>{
-      let keys=Object.keys(e);
       return (<Card>
-        {keys.map((item)=>(<div><span>{item} :</span><span>{e[item]}</span></div>))}
-      </Card>)
+        <div><span> ID : {e.optID}</span><span> Coin : {e.coin}</span><span> Start Time : {new Date(e.startTime).toLocaleString()}</span></div>
+        <Button type="primary" onClick={(evt)=>this.handleViewDetail(evt,e.optID)} >View</Button>
+      </Card>);
     };
+
+      const {optDetail:target={}}=this.state;
+      const keys=Object.keys(target);
+
 
     return (
       <Fragment>
@@ -183,39 +175,63 @@ export default class Analysis extends Component {
                   </Col>
                 </Row>
                 <Table />
-                <h3 style={{marginTop:32}}>Total Number: 1</h3>
+                <h3 style={{marginTop:32}}>Total Number: {this.props.option.count||0}</h3>
                 {this.props.option.list.map((e)=>OptionCard(e))}
               </ChartCard>
-          </Col>
-          <Col {...topChartResponsiveProps}>
-            <ChartCard
-              bordered={false}
-            >
-              <ChartComponent />
-            </ChartCard>
           </Col>
           <Col {...topRightResponsiveProps}>
             <ChartCard
               bordered={false}
             >
-              <Row style={{marginTop:32}}>
-                <Col span={10}>
-                  <Input placeholder="请输入数量" />
-                </Col>
-                <Col offset={1} span={3}>
-                  <Button style={{color:"green"}}>Sell</Button>
-                </Col>
-              </Row>
-              <Row style={{marginTop:32}}>
-                <Col span={10}>
-                  <Input placeholder="请输入数量" />
-                </Col>
-                <Col offset={1} span={3}>
-                  <Button style={{color:"red"}}>Buy</Button>
-                </Col>
-              </Row>
+              <ChartComponent />
             </ChartCard>
+            {keys.length?(
+              <Card>
+                <Row>
+                  <Col span={16}>
+                    {keys.map(e=>(<div>{`${e} : ${target[e]}`}</div>))}
+                  </Col>
+                  <Col span={8}>
+                    <Form>
+                      <Form.Item>
+                        {
+                          getFieldDecorator('long')(<Input />)
+                        }
+                        <Button type="primary" onClick={this.handleBuyLong}>Buy Long</Button>
+                      </Form.Item>
+                      <Form.Item>
+                        {
+                          getFieldDecorator('short')(<Input />)
+                        }
+                        <Button type="primary" onClick={this.handleBuyShort}>Buy Short</Button>
+                      </Form.Item>
+                    </Form>
+                  </Col>
+                </Row>
+              </Card>):""}
           </Col>
+          {/*<Col {...topRightResponsiveProps}>*/}
+            {/*<ChartCard*/}
+              {/*bordered={false}*/}
+            {/*>*/}
+              {/*<Row style={{marginTop:32}}>*/}
+                {/*<Col span={10}>*/}
+                  {/*<Input placeholder="请输入数量" />*/}
+                {/*</Col>*/}
+                {/*<Col offset={1} span={3}>*/}
+                  {/*<Button style={{color:"green"}}>Sell</Button>*/}
+                {/*</Col>*/}
+              {/*</Row>*/}
+              {/*<Row style={{marginTop:32}}>*/}
+                {/*<Col span={10}>*/}
+                  {/*<Input placeholder="请输入数量" />*/}
+                {/*</Col>*/}
+                {/*<Col offset={1} span={3}>*/}
+                  {/*<Button style={{color:"red"}}>Buy</Button>*/}
+                {/*</Col>*/}
+              {/*</Row>*/}
+            {/*</ChartCard>*/}
+          {/*</Col>*/}
         </Row>
       </Fragment>
     );

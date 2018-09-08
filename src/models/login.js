@@ -1,6 +1,6 @@
 import { routerRedux } from 'dva/router';
 import { stringify } from 'qs';
-import { doLogin } from '../services/api_login';
+import { doLogin,editEmail} from '../services/api_login';
 import { setAuthority } from '../utils/authority';
 import { reloadAuthorized } from '../utils/Authorized';
 import { getPageQuery } from '../utils/utils';
@@ -13,11 +13,13 @@ export default {
     accounts:[],
     email:"",
     token:"",
+    username:"",
   },
 
   effects: {
     *login({ payload }, { call, put }) {
       let response = yield call(doLogin, payload);
+      console.log(response);
       if(response.error===undefined){
         response.currentAuthority="admin";
         response.status="ok";
@@ -65,6 +67,11 @@ export default {
         })
       );
     },
+    *editEmail({payload},{call,put}){
+      console.log(payload);
+      const response= yield call(editEmail,payload);
+      console.log(response);
+    },
   },
 
   reducers: {
@@ -77,6 +84,7 @@ export default {
         accounts:payload.accounts||[],
         email:payload.email||"",
         token:payload.token||"",
+        username:payload.username||"",
       };
     },
   },
