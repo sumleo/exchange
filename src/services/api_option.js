@@ -41,3 +41,8 @@ export async function buyShort(param) {
   });
 }
 
+export async function kLine(){
+  return request(
+    'http://18.191.191.239:3000/api');
+}
+

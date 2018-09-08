@@ -1,4 +1,4 @@
-import {doList,buyLong,buyShort} from '../services/api_option';
+import {doList,buyLong,buyShort,kLine} from '../services/api_option';
 import {message} from 'antd';
 
 export default {
@@ -6,12 +6,13 @@ export default {
 
   state: {
     list:[],
-    count:0.
+    count:0,
+    data:{},
+    ts:0,
   },
 
   effects: {
     *getPage({payload}, { call, put }) {
-      console.log(payload)
       const response=yield call(doList,payload);
       console.log(response);
       yield put({
@@ -27,6 +28,13 @@ export default {
       const response=yield call(buyShort,payload);
       message.info(response);
     },
+    *getKLine(_,{call,put}){
+      const response=yield call(kLine);
+      yield put({
+        type:"putKLine",
+        payload:response,
+      });
+    },
   },
 
   reducers: {
@@ -36,6 +44,13 @@ export default {
         list:payload.list||[],
         count:payload.count||0,
       };
+    },
+    putKLine(state,{payload}){
+      return {
+        ...state,
+        data:payload.data||[],
+        ts:payload.ts,
+      }
     },
   },
 };

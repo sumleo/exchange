@@ -14,6 +14,8 @@ const baseURL="http://www.ucomputingchain.com:3030";
 // 代码中会兼容本地 service mock 以及部署站点的静态数据
 
 const proxy = {
+  'GET /market/history/kline':
+    'https://api.huobipro.com/market/history/kline?period=1day&size=200&symbol=btcusdt&AccessKeyId=7c31c94c-56d262be-67fb0e41-0ff6c',
   'GET /trade/options':`${baseURL}/`,
   'GET /tx/options':`${baseURL}/`,
   'POST /user':`${baseURL}/`,

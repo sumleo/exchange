@@ -69,6 +69,9 @@ export default class Analysis extends Component {
       type:'option/getPage',
       payload:{token:this.props.login.token},
     });
+    dispatch({
+      type:"option/getKLine",
+    })
   }
 
 

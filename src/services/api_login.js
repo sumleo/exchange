@@ -3,7 +3,12 @@ import request from '../utils/request';
 
 export async function doLogin(params) {
   const {userName="",password=""}=params;
-  return request(`/user?username=${userName}&password=${password}`);
+  const headers={
+    'Access-Control-Allow-Credentials': 'true',
+  };
+  return request(`/user?username=${userName}&password=${password}`,{
+    headers,
+  });
 }
 
 export async function editEmail(param) {
